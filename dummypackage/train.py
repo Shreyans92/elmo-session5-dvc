@@ -9,7 +9,7 @@ import torch
 import hydra
 from omegaconf import DictConfig
 
-import utils
+from dummypackage import utils
 
 log = utils.get_pylogger(__name__)
 

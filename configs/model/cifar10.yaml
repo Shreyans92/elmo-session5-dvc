@@ -1,4 +1,4 @@
-_target_: models.timm_module.TIMMLitModule
+_target_: dummypackage.models.timm_module.TIMMLitModule
 
 optimizer:
   _target_: torch.optim.Adam
@@ -14,5 +14,5 @@ scheduler:
   patience: 10
 
 net:
-  _target_: models.components.timm_net.TIMMModel
+  _target_: dummypackage.models.components.timm_net.TIMMModel
   model: "resnet18"
