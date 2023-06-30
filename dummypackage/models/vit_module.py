@@ -11,7 +11,6 @@ from torch.nn import functional as F
 from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
 
-
 class PatchEmbedding(nn.Module):
     def __init__(
         self,
@@ -56,7 +55,6 @@ class PatchEmbedding(nn.Module):
         x += self.positional_emb
 
         return x
-
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, emb_size=768, num_heads=8, dropout=0):
@@ -105,7 +103,6 @@ class MultiHeadAttention(nn.Module):
 
         return out
 
-
 class ResidualAdd(nn.Module):
     def __init__(self, fn):
         super(ResidualAdd, self).__init__()
@@ -121,14 +118,12 @@ class ResidualAdd(nn.Module):
 
         return out
 
-
 FeedForwardBlock = lambda emb_size=768, expansion=4, drop_p=0.0: nn.Sequential(
     nn.Linear(emb_size, expansion * emb_size),
     nn.GELU(),
     nn.Dropout(drop_p),
     nn.Linear(expansion * emb_size, emb_size),
 )
-
 
 class TransformerEncoderBlock(nn.Sequential):
     def __init__(
@@ -153,13 +148,11 @@ class TransformerEncoderBlock(nn.Sequential):
             ),
         )
 
-
 class TransformerEncoder(nn.Sequential):
     def __init__(self, depth=12, **kwargs):
         super(TransformerEncoder, self).__init__(
             *(TransformerEncoderBlock(**kwargs) for _ in range(depth))
         )
-
 
 class ClassificationHead(nn.Sequential):
     def __init__(self, emb_size=768, num_classes=1000):
@@ -171,7 +164,6 @@ class ClassificationHead(nn.Sequential):
             nn.Linear(emb_size, num_classes),
         )
 
-
 class ViT(nn.Sequential):
     def __init__(
         self,
@@ -180,7 +172,7 @@ class ViT(nn.Sequential):
         emb_size=768,
         img_size=224,
         depth=12,
-        num_classes=1000,
+        num_classes=2,
         **kwargs
     ):
         super(ViT, self).__init__(
@@ -194,31 +186,20 @@ class ViT(nn.Sequential):
             ClassificationHead(emb_size, num_classes),
         )
 
-
 class VitLitModule(LightningModule):
     def __init__(
         self,
+        net,
         optimizer: torch.optim.Optimizer,
         scheduler: torch.optim.lr_scheduler,
         num_classes=10,
-        in_channels=3,
-        patch_size=4,
-        emb_size=64,
-        img_size=32,
-        depth=6,
+        topk=3
     ):
         super().__init__()
 
-        self.save_hyperparameters(logger=False, ignore=["model"])
+        self.save_hyperparameters(logger=False, ignore=["net"])
 
-        self.model = ViT(
-            in_channels=3,
-            patch_size=4,
-            emb_size=64,
-            img_size=32,
-            depth=6,
-            num_classes=num_classes,
-        )
+        self.model = net
 
         # loss function
         self.criterion = torch.nn.CrossEntropyLoss()
@@ -249,6 +230,13 @@ class VitLitModule(LightningModule):
         loss = self.criterion(logits, y)
         preds = torch.argmax(logits, dim=1)
         return loss, preds, y
+
+    def model_predict_step(self, batch: Any):
+        x, y = batch
+        logits = self.forward(x)
+        return logits
+
+
 
     def training_step(self, batch: Any, batch_idx: int):
         loss, preds, targets = self.model_step(batch)
@@ -301,12 +289,24 @@ class VitLitModule(LightningModule):
     def on_test_epoch_end(self):
         pass
 
+    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
+
+        logits = self.model_predict_step(batch)
+        prob = F.softmax(logits, dim=1)
+        top_p, top_class = prob.topk(self.hparams.topk, dim = 1)
+        #predictions = torch.nn.functional.softmax(logits, dim=1)
+        return top_p.cpu().tolist()
+
+
+
+
+
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
         Normally you'd need one. But in the case of GANs or similar you might have multiple.
 
         Examples:
-            https://lightning.ai/docs/pytorch/latest/common/lightning_module.html#configure-optimizers
+            <https://lightning.ai/docs/pytorch/latest/common/lightning_module.html#configure-optimizers>
         """
         optimizer = self.hparams.optimizer(params=self.parameters())
         if self.hparams.scheduler is not None:

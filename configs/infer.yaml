@@ -1,0 +1,11 @@
+defaults:
+  - _self_
+  - data: image_folder.yaml
+  - model: vit.yaml
+  - paths: default.yaml
+  - trainer: default.yaml
+
+
+# ckpt_dir: ${hydra:runtime.cwd}/outputs/
+# ckpt_file: 2023-06-29/00-32-27/checkpoints/epoch_000.ckpt
+ckpt_path: ${paths.root_dir}/outputs/2023-06-29/17-26-10/lightning_logs/version_0/checkpoints/epoch=0-step=313.ckpt

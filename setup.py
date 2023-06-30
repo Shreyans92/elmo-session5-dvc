@@ -16,6 +16,7 @@ setup(
         "console_scripts": [
             "dummy_train = dummypackage.train:main",
             "dummy_eval = dummypackage.eval:main",
+            "dummy_infer = dummypackage.inference:main",
         ]
     },
 )
