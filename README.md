@@ -46,7 +46,7 @@ To predict model outcome on a single image, run the following command:
 dummy_infer
 ```
 
-> Note: Keep the single i,age in respective class folder as Imagefolder package from toch has been used.
+> Note: Keep the single image in respective class folder as Imagefolder package from toch has been used.
 
 The output of above command is class probability, in this case classes are {Cat,Dog}.The output is shown below:
 
