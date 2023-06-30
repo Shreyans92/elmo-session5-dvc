@@ -48,7 +48,7 @@ dummy_infer
 
 > Note: Keep the single image in respective class folder as Imagefolder package from toch has been used.
 
-The output of above command is class probability, in this case classes are {Cat,Dog}.The output is shown below:
+The output of above command is class probability, in this case classes are {Cat,Dog}.vThe output is shown below:
 
 ```bash
 {'Cat': 0.6777524352073669, 'Dog': 0.32224759459495544}
