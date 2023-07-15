@@ -40,4 +40,4 @@ dvc pull -r local
 ## Result
 
 ### AIM Run
-![Patch Size multi runs](aim-up.png)
+![Patch Size multi runs](aim-run.png)
