@@ -1,60 +1,43 @@
-# ELMO_session_4
-# Lightning Template
+# EMLOv3 | Data Version Control
 
+
+This repo is based on the [ELMO Lightning](https://github.com/Shreyans92/ELMO_lightening) repo with additional feature of data version control. The package created is named as dummypackage.
+
+Here are the instructions to use it with added DVC.
+
+## DVC Setup
+
+1. Make a data folder and put all your data in Data folder.
+
+2. Add DVC to Data:
+
+```bash
+ dvc add data
 ```
-copper_train --help
-```
-
-examples
-
-- `copper_train data.num_workers=16`
-- `copper_train data.num_workers=16 trainer.deterministic=True +trainer.fast_dev_run=True`
-
-## Development
-
-Install in dev mode
-
-```
-pip install -e .
-```
-
-# Run with docker
-
-Build the image
-
-```
-docker build --tag cifar:latest .
+> Note: If the data is getting tracked by git, run the following commands:
+```bash
+   git rm -r --cached 'data'
+   git commit -m "stop tracking data"
 ```
 
-Train the model with docker run
+3. Using Local Storage to add data, run the following command:
 
-```
-docker run -it cifar:latest python dummypackage/train.py +experiment=cifar10_example
-```
-
-Evalate model
-
-```
-docker run -it cifar:latest python dummypackage/eval.py +experiment=cifar10_example
+```bash
+dvc remote add -d local <local-path>
 ```
 
+4. Push the data to remote, run the following command:
 
-# Run in DevContainer
-
-### To train the model in devContainer
-
-First, update PYTHONPATH for the environment
-```
-export PATH="$PATH:/workspaces/project-setup/dummypackage
-export PATH="$PATH:/workspaces/project-setup
-```
-Now, train the model
-```
-python3 dummypackage/train.py 
+```bash
+dvc push -r local
 ```
 
-### To evaluate the model in devContainer
+5. Pull the data from remote storage, run the following command:
 
+```bash
+dvc pull -r local
 ```
-python3 dummypackage/eval.py 
-```
+## Result
+
+### AIM Run
+![multirun for patch size ]
